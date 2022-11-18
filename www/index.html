@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #121212;
+      color: #efefef;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    input {
+      appearance: none;
+      margin: 0.5rem;
+      border: 0;
+      padding: 1rem;
+      color: #efefef;
+      background: #333;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <input placeholder="255" type="number" max="255" min="0" required id="redIn">
+  <input placeholder="255" type="number" max="255" min="0" required id="greenIn">
+  <input placeholder="255" type="number" max="255" min="0" required id="blueIn">
+
+  <script src="wasm_exec.js"></script>
+  <script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("color.wasm"), go.importObject).then((result) => {
+      go.run(result.instance);
+    });
+  </script>
+  <script>
+
+    const redIn = document.getElementById("redIn")
+    const greenIn = document.getElementById("greenIn")
+    const blueIn = document.getElementById("blueIn")
+
+    redIn.value = redIn.value || 255
+    greenIn.value = greenIn.value || 167
+    blueIn.value = blueIn.value || 99
+
+    let current = {
+      r: Number(redIn.value), g: Number(greenIn.value), b: Number(blueIn.value)
+    }
+
+    setTimeout(() => {
+      renderRGBValue(current.r, current.g, current.b)
+    }, 1000)
+
+
+    redIn.addEventListener("keyup", (e) => {
+      current.r = Number(e.target.value)
+      renderRGBValue(current.r, current.g, current.b)
+    })
+
+    greenIn.addEventListener("keyup", (e) => {
+      current.g = Number(e.target.value)
+      renderRGBValue(current.r, current.g, current.b)
+    })
+
+    blueIn.addEventListener("keyup", (e) => {
+      current.b = Number(e.target.value)
+      renderRGBValue(current.r, current.g, current.b)
+    })
+
+    function renderRGBValue(r, g, b) {
+      const hex = rgbToHex(r, g, b)
+      document.body.style.backgroundColor = `#${hex}`
+    }
+
+  </script>
+</body>
+
+</html>
